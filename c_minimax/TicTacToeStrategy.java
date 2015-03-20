@@ -28,6 +28,11 @@ public class TicTacToeStrategy implements InterfaceStrategy {
 		    getBestMove(posNew,context2);
 		    score = -1*context2.getBestScoreSoFar();
 		}
+
+		if (score == 1) {
+		    context.setBestMoveSoFar(iPos, score );
+		    break;
+		}
 	       
                 if (context.getBestScoreSoFar() <  score ) {
                     context.setBestMoveSoFar(iPos, score );

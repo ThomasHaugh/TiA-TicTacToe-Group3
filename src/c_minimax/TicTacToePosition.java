@@ -248,6 +248,16 @@ public class TicTacToePosition implements InterfacePosition {
 		return state;
     	
     }
+    
+    public int getTurnCount() {
+    	int result = 9;
+    	for (int i = 0; i < 9; i++) {
+    		if (getColor(i) == 0) {
+    			result--;
+    		}
+    	}
+    	return result;
+    }
     //End added Methods
 
     @Override

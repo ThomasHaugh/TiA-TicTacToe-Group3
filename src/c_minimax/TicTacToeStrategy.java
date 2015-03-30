@@ -2,6 +2,12 @@ package c_minimax;
 
 import java.util.HashMap;
 
+import c_minimax.InterfaceIterator;
+import c_minimax.InterfacePosition;
+import c_minimax.InterfaceStrategy;
+import c_minimax.TicTacToeIterator;
+import c_minimax.TicTacToePosition;
+
 //author: Gary Kalmanovich; rights reserved
 
 public class TicTacToeStrategy implements InterfaceStrategy {

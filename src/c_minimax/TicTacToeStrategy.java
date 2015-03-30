@@ -25,8 +25,10 @@ public class TicTacToeStrategy implements InterfaceStrategy {
                 posNew.setColor(iPos, player);
                 // if this game state had been saved before
                 if (hashedStates.containsKey(posNew.getRawPosition())) {
-                	float savedScore = hashedStates.get(posNew.getRawPosition());
+                	Integer savedScore = hashedStates.get(posNew.getRawPosition());
                 	context.setBestMoveSoFar(iPos,savedScore);
+                	((TicTacToePosition) posNew).insertIntoHash(hashedStates, 
+                			((Long)posNew.getRawPosition()).intValue(), savedScore);
             		return; //prune after finding the saved best move
                 } else {
 	                int isWin = posNew.isWinner();
@@ -51,12 +53,19 @@ public class TicTacToeStrategy implements InterfaceStrategy {
 	                    score = -1 * newContext.getBestScoreSoFar();
 		                //we want a max 
 		                if(score > context.getBestScoreSoFar()){
-		                	context.setBestMoveSoFar(iPos,score);
+		                	((TicTacToeSearchInfo)context).setBestMoveSoFar(iPos,score, posNew);
+		                	if (score == 1) {
+		                		((TicTacToePosition) posNew).insertIntoHash(hashedStates, 
+		                				((Long)posNew.getRawPosition()).intValue(), 1);
+		                		return;
+		                	}
 		                }
 	                }
                 }
             }
         }
+        TicTacToePosition bestGameState = (TicTacToePosition) ((TicTacToeSearchInfo)context).getBestGameState();
+        bestGameState.insertIntoHash(hashedStates, ((int)bestGameState.getRawPosition()), (int) context.getBestScoreSoFar());
         return;
     }
     
@@ -74,10 +83,15 @@ public class TicTacToeStrategy implements InterfaceStrategy {
 
 
 class TicTacToeSearchInfo implements InterfaceSearchInfo {
-
+	
+	InterfacePosition bestGameState  = null;
     InterfaceIterator bestMoveSoFar  = null;
     float             bestScoreSoFar = Float.NEGATIVE_INFINITY;
-
+    
+    public InterfacePosition getBestGameState() {
+    	return bestGameState;
+    }
+    
     @Override
     public InterfaceIterator getBestMoveSoFar() {
         return bestMoveSoFar;
@@ -93,7 +107,13 @@ class TicTacToeSearchInfo implements InterfaceSearchInfo {
         bestMoveSoFar  = new TicTacToeIterator(newMove);
         bestScoreSoFar = newScore;
     }
-
+    
+    public void setBestMoveSoFar(InterfaceIterator newMove, float newScore, InterfacePosition gameState) {
+        bestMoveSoFar  = new TicTacToeIterator(newMove);
+        bestScoreSoFar = newScore;
+        bestGameState  = gameState;
+    }
+    
     @Override
     public int getMinDepthSearchForThisPos() {
         // Not used in this strategy

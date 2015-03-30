@@ -17,40 +17,49 @@ public class TicTacToeStrategy implements InterfaceStrategy {
     @Override
     public void getBestMove(InterfacePosition position, InterfaceSearchInfo context) {
         // Note, return information is embedded in context
-    	
         int player = position.getPlayer();
         int opponent = 3-player; // There are two players, 1 and 2.
         for ( InterfaceIterator iPos = new TicTacToeIterator(); iPos.isInBounds(); iPos.increment() ) {
             InterfacePosition posNew = new TicTacToePosition(position,hashedStates);
             if (posNew.getColor(iPos) == 0) { // This is a free spot
                 posNew.setColor(iPos, player);
-                int isWin = posNew.isWinner();
-                float score = 0;
-                // TODO Based on isWin, come up with a score or what to do to get the score
-                //iterate through all other positions if we don't have a win, loss or draw
-                if(isWin == -1){
-                	//define our stuff
-                    posNew.setPlayer(opponent);
-
-                    //create a new context so we can get its score from the children
-                    InterfaceSearchInfo newContext = new TicTacToeSearchInfo();
-                    getBestMove(posNew,newContext);
-                    score = -1 * newContext.getBestScoreSoFar();
-                }else{
-                	score = isWin == 0 ? 0 : 1;
+                // if this game state had been saved before
+                if (hashedStates.containsKey(posNew.getRawPosition())) {
+                	float savedScore = hashedStates.get(posNew.getRawPosition());
+                	context.setBestMoveSoFar(iPos,savedScore);
+            		return; //prune after finding the saved best move
+                } else {
+	                int isWin = posNew.isWinner();
+	                //if the game is finished
+	            	if (isWin != -1) {
+	            		if (isWin == player) {
+	                		context.setBestMoveSoFar(iPos,1);
+	                	} else if(isWin == opponent){
+	                    	context.setBestMoveSoFar(iPos,-1);
+	                    } else {
+	                    	context.setBestMoveSoFar(iPos,0);
+	                    }
+	            		return;
+	            	}
+	                float score = 0;
+	                //if the game is still going...
+	                if(isWin == -1){
+	                    posNew.setPlayer(opponent);
+	                    //create a new context so we can get its score from the children
+	                    InterfaceSearchInfo newContext = new TicTacToeSearchInfo();
+	                    getBestMove(posNew,newContext);
+	                    score = -1 * newContext.getBestScoreSoFar();
+		                //we want a max 
+		                if(score > context.getBestScoreSoFar()){
+		                	context.setBestMoveSoFar(iPos,score);
+		                }
+	                }
                 }
-                //we want a max 
-                if(score > context.getBestScoreSoFar()){
-                	context.setBestMoveSoFar(iPos,score);
-                	if (score > 0)
-                		return; //prune after finding the first good move
-                }
-                //reset the board so we can make the next move properly
-                //posNew.setColor(iPos, 0);
             }
         }
+        return;
     }
-
+    
     @Override
     public void setContext(InterfaceSearchInfo strategyContext) {
         // Not used in this strategy

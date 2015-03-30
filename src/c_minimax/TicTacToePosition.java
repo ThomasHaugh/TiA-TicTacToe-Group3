@@ -210,7 +210,44 @@ public class TicTacToePosition implements InterfacePosition {
 
     	return pos;
     }
-
+    
+    public void insertIntoHash(HashMap<Integer,Integer> hashedStates, Integer position, Integer status ) {
+    	hashedStates.put(position,status);
+    	position = flip(position);
+		hashedStates.put(position,status);
+		position = rotate(position); // 1
+		hashedStates.put(position,status);
+		position = flip(position);
+		hashedStates.put(position,status);
+		position = rotate(position); // 2
+		hashedStates.put(position,status);
+		position = flip(position);
+		hashedStates.put(position,status);
+		position = rotate(position); // 3
+		hashedStates.put(position,status);
+		position = flip(position);
+		hashedStates.put(position,status);
+		position = rotate(position); // 4
+		hashedStates.put(position,status);
+    }
+    
+    public int getColor( int squareNum ) { // 0 if empty, 1 if x(cross), 2 if o(donut)
+        // Return a color at square referenced by an integer from 0-8 from position (i.e., decode position)
+        // position is simply an int that encodes the position and whose move it is.
+    	
+    	return (int) (((position>>>((squareNum)*2)) | ~3L) & 3L);
+    }
+    
+    //for debugging
+    public String toString() {
+    	String state = 	getColor(0) + "|" + getColor(1) + "|" +getColor(2) + "\n" +
+    					"------------" +"\n" +
+    					getColor(3) + "|" + getColor(4) + "|" +getColor(5) + "\n" +
+    					"------------" +"\n" +
+    					getColor(6) + "|" + getColor(7) + "|" +getColor(8) + "\n";
+		return state;
+    	
+    }
     //End added Methods
 
     @Override
@@ -226,59 +263,30 @@ public class TicTacToePosition implements InterfacePosition {
     	// Note that one of five squares must be occupied for there to be a winner
     	// Namely the intersection of the top row, and the left column 
 
-    	if ( hashStates.containsKey(position)) {
-    		//System.out.println("Saw This Before!!!");
-    		return hashStates.get(position).intValue();
-    	}
-    	else{
-    		//haven't seen it before
-    		int winColor = 0;
+		int retVal = 0;
 
-    		// First Check the Diagonals
-    		if( (getColor(0,0) == getColor(1,1)) && (getColor(0,0) == getColor(2,2))) {
-    			if(getColor(1,1) > 0) {winColor = getColor(1,1);}
-    		}
+		// First Check the Diagonals
+		if( (getColor(0,0) == getColor(1,1)) && (getColor(0,0) == getColor(2,2))) {
+			if(getColor(1,1) > 0) {retVal = getColor(1,1);}
+		}
 
-    		if( (getColor(0,2) == getColor(1,1)) && (getColor(0,2) == getColor(2,0))) {
-    			if(getColor(1,1) > 0) {winColor = getColor(1,1);}
-    		}
+		if( (getColor(0,2) == getColor(1,1)) && (getColor(0,2) == getColor(2,0))) {
+			if(getColor(1,1) > 0) {retVal = getColor(1,1);}
+		}
 
-    		// Now Check the rows and columns
-    		for(int i = 0; i < 3; i++) {
-    			if (winColor   > 0) {break;}
-    			if (ver(i) != 0) {winColor = ver(i);}
-    			if (hor(i) != 0) {winColor = hor(i);}
-    		}
+		// Now Check the rows and columns
+		for(int i = 0; i < 3; i++) {
+			if (retVal   > 0) {break;}
+			if (ver(i) != 0) {retVal = ver(i);}
+			if (hor(i) != 0) {retVal = hor(i);}
+		}
 
-    		int retVal = 0;
-
-    		if (winColor > 0) { retVal = winColor;}
-    		else {
-    			if (isDone()) {retVal = 0;}
-    			else {retVal = -1;}
-    		}
-    		int pos = position;
-    		//We need four rotates with alternating flips
-    		hashStates.put(pos,retVal);
-    		pos = flip(pos);
-    		hashStates.put(pos,retVal);
-    		pos = rotate(pos); // 1
-    		hashStates.put(pos,retVal);
-    		pos = flip(pos);
-    		hashStates.put(pos,retVal);
-    		pos = rotate(pos); // 2
-    		hashStates.put(pos,retVal);
-    		pos = flip(pos);
-    		hashStates.put(pos,retVal);
-    		pos = rotate(pos); // 3
-    		hashStates.put(pos,retVal);
-    		pos = flip(pos);
-    		hashStates.put(pos,retVal);
-    		pos = rotate(pos); // 4
-    		hashStates.put(pos,retVal);
-
-    		return retVal;
-    	}
+		if (retVal > 0) return retVal;
+		else {
+			if (isDone()) {retVal = 0;}
+			else {retVal = -1;}
+		}
+		return retVal;
     }
 
     @Override

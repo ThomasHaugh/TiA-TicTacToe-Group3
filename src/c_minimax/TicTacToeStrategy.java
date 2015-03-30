@@ -64,8 +64,10 @@ public class TicTacToeStrategy implements InterfaceStrategy {
                 }
             }
         }
-        TicTacToePosition bestGameState = (TicTacToePosition) ((TicTacToeSearchInfo)context).getBestGameState();
-        bestGameState.insertIntoHash(hashedStates, ((int)bestGameState.getRawPosition()), (int) context.getBestScoreSoFar());
+        if (player == 1) {
+	        TicTacToePosition bestGameState = (TicTacToePosition) ((TicTacToeSearchInfo)context).getBestGameState();
+	        bestGameState.insertIntoHash(hashedStates, ((int)bestGameState.getRawPosition()), (int) context.getBestScoreSoFar());
+        }
         return;
     }
     

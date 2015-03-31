@@ -26,10 +26,12 @@ public class TicTacToeStrategy implements InterfaceStrategy {
                 // if this game state had been saved before
                 if (hashedStates.containsKey(posNew.getRawPosition())) {
                 	Integer savedScore = hashedStates.get(posNew.getRawPosition());
-                	context.setBestMoveSoFar(iPos,savedScore);
-                	((TicTacToePosition) posNew).insertIntoHash(hashedStates, 
+                	if (savedScore > context.getBestScoreSoFar())
+                		context.setBestMoveSoFar(iPos,savedScore);
+                		((TicTacToePosition) posNew).insertIntoHash(hashedStates, 
                 			((Long)posNew.getRawPosition()).intValue(), savedScore);
-            		return; //prune after finding the saved best move
+                		if (savedScore > 0)
+                			return; //prune after finding the saved best move
                 } else {
 	                int isWin = posNew.isWinner();
 	                //if the game is finished
